@@ -17,13 +17,13 @@
 <filein>Extensions/Number class.st</filein>
 <filein>Extensions/Object.st</filein>
 <filein>Extensions/Object class.st</filein>
-<filein>Extensions/SCouchChunkedContentStream.st</filein>
-<filein>Extensions/SCouchDBAdaptor.st</filein>
-<filein>Extensions/SCouchDBError.st</filein>
-<filein>Extensions/SCouchDatabase.st</filein>
-<filein>Extensions/SCouchHTTPCodes.st</filein>
-<filein>Extensions/SCouchHTTPResponse.st</filein>
-<filein>Extensions/SCouchUTF8Stream.st</filein>
+<filein>Core/SCouchChunkedContentStream.st</filein>
+<filein>Core/SCouchDBAdaptor.st</filein>
+<filein>Core/SCouchDBError.st</filein>
+<filein>Core/SCouchDatabase.st</filein>
+<filein>Core/SCouchHTTPCodes.st</filein>
+<filein>Core/SCouchHTTPResponse.st</filein>
+<filein>Core/SCouchUTF8Stream.st</filein>
 <filein>Extensions/String.st</filein>
 <filein>Extensions/String class.st</filein>
 <filein>Extensions/UndefinedObject.st</filein>
@@ -41,15 +41,15 @@
 <file>Extensions/Number class.st</file>
 <file>Extensions/Object.st</file>
 <file>Extensions/Object class.st</file>
-<file>Extensions/SCouchChunkedContentStream.st</file>
-<file>Extensions/SCouchDBAdaptor.st</file>
-<file>Extensions/SCouchDBError.st</file>
-<file>Extensions/SCouchDatabase.st</file>
-<file>Extensions/SCouchHTTPCodes.st</file>
-<file>Extensions/SCouchHTTPResponse.st</file>
-<file>Extensions/SCouchUTF8Stream.st</file>
+<file>Core/SCouchChunkedContentStream.st</file>
+<file>Core/SCouchDBAdaptor.st</file>
+<file>Core/SCouchDBError.st</file>
+<file>Core/SCouchDatabase.st</file>
+<file>Core/SCouchHTTPCodes.st</file>
+<file>Core/SCouchHTTPResponse.st</file>
+<file>Core/SCouchUTF8Stream.st</file>
 <file>Extensions/String.st</file>
 <file>Extensions/String class.st</file>
 <file>Extensions/UndefinedObject.st</file>
 <file>Extensions/UndefinedObject class.st</file>
-</package>
+</package>
