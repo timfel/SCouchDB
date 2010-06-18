@@ -7,6 +7,18 @@ SharedPool subclass: SCouchHTTPCodes [
     HTTPErrorConflict := nil.
     HTTPOK := nil.
 
+    SCouchHTTPCodes class >> httpCreated [
+	^HTTPCreated
+    ]
+
+    SCouchHTTPCodes class >> httpErrorConflict [
+	^HTTPErrorConflict
+    ]
+
+    SCouchHTTPCodes class >> httpOk [
+	^HTTPOK
+    ]
+
     SCouchHTTPCodes class >> initialize [
 	"self initialize"
 

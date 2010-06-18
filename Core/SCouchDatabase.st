@@ -63,7 +63,7 @@ Object subclass: SCouchDatabase [
 	| response result |
 	response := adaptor get: self namePrefix , id asString encodeForHTTP.
 	result := adaptor readJsonFrom: response.
-	response code = HTTPOK ifTrue: [^result].
+	response code = SCouchHTTPCodes httpOk ifTrue: [^result].
 	^adaptor couchDBError: result
     ]
 
@@ -73,7 +73,8 @@ Object subclass: SCouchDatabase [
 	<category: 'accessing'>
 	| response |
 	response := adaptor get: self namePrefix , id asString encodeForHTTP.
-	response code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
+	response code = SCouchHTTPCodes httpOk 
+	    ifTrue: [^adaptor readJsonFrom: response].
 	^aBlock value
     ]
 
@@ -83,7 +84,8 @@ Object subclass: SCouchDatabase [
 	<category: 'accessing'>
 	| response |
 	response := adaptor get: self namePrefix , key asString encodeForHTTP.
-	response code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
+	response code = SCouchHTTPCodes httpOk 
+	    ifTrue: [^adaptor readJsonFrom: response].
 	^self documentAt: key put: aBlockWithJsonObject value
     ]
 
@@ -93,9 +95,10 @@ Object subclass: SCouchDatabase [
 	content := self utf8Encode: jsonObject asJsonString.
 	response := self put: id asString encodeForHTTP content: content.
 	code := response code.
-	code = HTTPCreated ifTrue: [^adaptor readJsonFrom: response].
-	code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
-	code = HTTPErrorConflict 
+	code = SCouchHTTPCodes httpCreated 
+	    ifTrue: [^adaptor readJsonFrom: response].
+	code = SCouchHTTPCodes httpOk ifTrue: [^adaptor readJsonFrom: response].
+	code = SCouchHTTPCodes httpErrorConflict 
 	    ifTrue: 
 		["document already exists"
 
@@ -116,7 +119,7 @@ Object subclass: SCouchDatabase [
 		    get: self namePrefix , id asString encodeForHTTP , '?rev=' 
 			    , rev asString encodeForHTTP.
 	result := adaptor readJsonFrom: response.
-	response code = HTTPOK ifTrue: [^result].
+	response code = SCouchHTTPCodes httpOk ifTrue: [^result].
 	^adaptor couchDBError: result
     ]
 
@@ -126,8 +129,9 @@ Object subclass: SCouchDatabase [
 	content := self utf8Encode: jsonObject asJsonString.
 	response := self post: content.
 	code := response code.
-	code = HTTPCreated ifTrue: [^adaptor readJsonFrom: response].
-	code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
+	code = SCouchHTTPCodes httpCreated 
+	    ifTrue: [^adaptor readJsonFrom: response].
+	code = SCouchHTTPCodes httpOk ifTrue: [^adaptor readJsonFrom: response].
 	self error: 'Boom'
     ]
 

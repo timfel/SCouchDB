@@ -23,7 +23,8 @@ Object subclass: SCouchDBAdaptor [
 		('abcdefghijklmnopqrstuvwxyz0123456789_$()+-/`' includes: c) 
 		    ifFalse: [^self error: 'Invalid database name']].
 	result := self put: '/' , aName encodeForHTTP , '/'.
-	result code = HTTPCreated ifTrue: [^self newDatabase name: aName].
+	result code = SCouchHTTPCodes httpCreated 
+	    ifTrue: [^self newDatabase name: aName].
 	^self couchDBError: (self readJsonFrom: result)
     ]
 
@@ -40,7 +41,7 @@ Object subclass: SCouchDBAdaptor [
 	header := self formRequestHeader: 'DELETE'
 		    path: '/' , aName encodeForHTTP , '/'.
 	result := self connectUsingHeader: header.
-	result code = HTTPOK 
+	result code = SCouchHTTPCodes httpOk 
 	    ifFalse: [^self couchDBError: (self readJsonFrom: result)]
     ]
 
