@@ -1,0 +1,55 @@
+<package>
+<!-- THIS FILE IS GENERATED! EDITS _WILL_ BE LOST ON UPDATE! -->
+<name>SCouchDB-Core</name>
+<test>
+<sunit></sunit>
+</test>
+<filein>Extensions/Boolean.st</filein>
+<filein>Extensions/Boolean class.st</filein>
+<filein>Extensions/Collection.st</filein>
+<filein>Extensions/Collection class.st</filein>
+<filein>Extensions/Date.st</filein>
+<filein>Extensions/DateAndTime.st</filein>
+<filein>Extensions/DateAndTime class.st</filein>
+<filein>Extensions/Dictionary.st</filein>
+<filein>Extensions/Dictionary class.st</filein>
+<filein>Extensions/Number.st</filein>
+<filein>Extensions/Number class.st</filein>
+<filein>Extensions/Object.st</filein>
+<filein>Extensions/Object class.st</filein>
+<filein>Extensions/SCouchChunkedContentStream.st</filein>
+<filein>Extensions/SCouchDBAdaptor.st</filein>
+<filein>Extensions/SCouchDBError.st</filein>
+<filein>Extensions/SCouchDatabase.st</filein>
+<filein>Extensions/SCouchHTTPCodes.st</filein>
+<filein>Extensions/SCouchHTTPResponse.st</filein>
+<filein>Extensions/SCouchUTF8Stream.st</filein>
+<filein>Extensions/String.st</filein>
+<filein>Extensions/String class.st</filein>
+<filein>Extensions/UndefinedObject.st</filein>
+<filein>Extensions/UndefinedObject class.st</filein>
+<file>Extensions/Boolean.st</file>
+<file>Extensions/Boolean class.st</file>
+<file>Extensions/Collection.st</file>
+<file>Extensions/Collection class.st</file>
+<file>Extensions/Date.st</file>
+<file>Extensions/DateAndTime.st</file>
+<file>Extensions/DateAndTime class.st</file>
+<file>Extensions/Dictionary.st</file>
+<file>Extensions/Dictionary class.st</file>
+<file>Extensions/Number.st</file>
+<file>Extensions/Number class.st</file>
+<file>Extensions/Object.st</file>
+<file>Extensions/Object class.st</file>
+<file>Extensions/SCouchChunkedContentStream.st</file>
+<file>Extensions/SCouchDBAdaptor.st</file>
+<file>Extensions/SCouchDBError.st</file>
+<file>Extensions/SCouchDatabase.st</file>
+<file>Extensions/SCouchHTTPCodes.st</file>
+<file>Extensions/SCouchHTTPResponse.st</file>
+<file>Extensions/SCouchUTF8Stream.st</file>
+<file>Extensions/String.st</file>
+<file>Extensions/String class.st</file>
+<file>Extensions/UndefinedObject.st</file>
+<file>Extensions/UndefinedObject class.st</file>
+</package>

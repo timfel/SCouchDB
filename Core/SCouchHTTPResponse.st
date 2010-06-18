@@ -1,96 +1,107 @@
-Object subclass: #SCouchHTTPResponse
-	instanceVariableNames: 'header code content cstream'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'SCouchDB-Core'!
+Object subclass: SCouchHTTPResponse [
+    | header code content cstream |
+    
+    <category: 'SCouchDB-Core'>
+    <comment: nil>
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/13/2010 20:42'!
-closeStream
+    closeStream [
 	"close an external connection, useful only for streaming response"
-	
-	cstream close! !
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 06:20'!
-code
+	<category: 'accessing'>
+	cstream close
+    ]
+
+    code [
 	"Answer the value of code"
 
-	^ code! !
+	<category: 'accessing'>
+	^code
+    ]
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 06:20'!
-code: anObject
+    code: anObject [
 	"Set the value of code"
 
-	code := anObject! !
+	<category: 'accessing'>
+	code := anObject
+    ]
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/13/2010 20:46'!
-content
+    content [
+	<category: 'accessing'>
+	^content ifNil: 
+		[| len |
+		content := (len := self contentLength) ifNil: 
+				["unknown content length"
 
-	^ content ifNil: [ | len |
-		content := (len := self contentLength) 
-			"unknown content length"
-			ifNil: [ cstream upToEnd ] 
-			ifNotNil: [ cstream next: (len asNumber) ].
+				cstream upToEnd]
+			    ifNotNil: [:foo | cstream next: len asNumber].
 		cstream close.
-		content ]! !
+		content]
+    ]
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 06:48'!
-contentLength
+    contentLength [
+	<category: 'accessing'>
+	^header at: 'content-length' ifAbsent: [nil]
+    ]
 
-	^ header at: 'content-length' ifAbsent: [nil]! !
+    contentType [
+	<category: 'accessing'>
+	^header at: 'content-type' ifAbsent: [nil]
+    ]
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 06:56'!
-contentType
-
-	^ header at: 'content-type' ifAbsent: [nil]! !
-
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 06:20'!
-header
+    header [
 	"Answer the value of header"
 
-	^ header! !
+	<category: 'accessing'>
+	^header
+    ]
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/13/2010 20:42'!
-readStream
-	^ cstream! !
+    readStream [
+	<category: 'accessing'>
+	^cstream
+    ]
 
-!SCouchHTTPResponse methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/13/2010 20:48'!
-transferEncoding
-	^ header at: 'transfer-encoding' ifAbsent: [nil ]! !
+    transferEncoding [
+	<category: 'accessing'>
+	^header at: 'transfer-encoding' ifAbsent: [nil]
+    ]
 
-
-!SCouchHTTPResponse methodsFor: 'initialize-release' stamp: 'Igor.Stasenko 3/16/2010 04:24'!
-contentStream: aStream
+    contentStream: aStream [
 	"use an appropriate content reader"
-	
+
+	<category: 'initialize-release'>
 	cstream := self isChunked 
-		ifTrue: [ SCouchChunkedContentStream on: aStream ]
-		ifFalse: [ aStream ]
-	! !
+		    ifTrue: [SCouchChunkedContentStream on: aStream]
+		    ifFalse: [aStream]
+    ]
 
-!SCouchHTTPResponse methodsFor: 'initialize-release' stamp: 'Igor.Stasenko 12/27/2009 06:45'!
-parseHeaderLines: lines
-
+    parseHeaderLines: lines [
 	"divide into basic lines"
-	| foldedLines i |
 
+	<category: 'initialize-release'>
 	"fold lines that start with spaces into the previous line"
+
+	| foldedLines i |
 	foldedLines := OrderedCollection new.
-	lines do: [ :line |
-		line first isSeparator ifTrue: [
-			foldedLines at: foldedLines size  put: (foldedLines last, line) ]
-		ifFalse: [ foldedLines add: line ] ].
+	lines do: 
+		[:line | 
+		line first isSeparator 
+		    ifTrue: [foldedLines at: foldedLines size put: foldedLines last , line]
+		    ifFalse: [foldedLines add: line]].
 
 	"make a dictionary mapping headers to header contents"
 	header := Dictionary new.
-	foldedLines do: [ :line |
+	foldedLines do: 
+		[:line | 
 		i := line indexOf: $:.
-		i > 0 ifTrue: [
-			header 
-			at: (line copyFrom: 1 to: i-1) asLowercase 
-			put: (line copyFrom: i+1 to: line size) withBlanksTrimmed ] ].
-! !
+		i > 0 
+		    ifTrue: 
+			[header at: (line copyFrom: 1 to: i - 1) asLowercase
+			    put: (line copyFrom: i + 1 to: line size) withBlanksTrimmed]]
+    ]
 
+    isChunked [
+	<category: 'testing'>
+	^self transferEncoding = 'chunked'
+    ]
+]
 
-!SCouchHTTPResponse methodsFor: 'testing' stamp: 'Igor.Stasenko 1/13/2010 20:48'!
-isChunked
-	^ self transferEncoding = 'chunked'! !

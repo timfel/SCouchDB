@@ -1,11 +1,11 @@
+Boolean extend [
 
-!Boolean methodsFor: '*SCouchDB-Core' stamp: 'Igor.Stasenko 1/12/2010 00:36'!
-asCouchDocument
+    asCouchDocument [
+	<category: '*SCouchDB-Core'>
+	^(JsonObject new)
+	    at: 'sq_class' put: self class name;
+	    yourself
+    ]
 
-	^ JsonObject new
-		at: 'sq_class' put: self class name;
-		yourself! !
-instantiateFromCouchDocument:
-	** ERROR!  THIS SCRIPT IS MISSING ** 
+]
 
-  

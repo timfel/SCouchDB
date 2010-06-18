@@ -1,5 +1,6 @@
-Error subclass: #SCouchDBError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'SCouchDB-Core'!
+Error subclass: SCouchDBError [
+    
+    <category: 'SCouchDB-Core'>
+    <comment: nil>
+]
+

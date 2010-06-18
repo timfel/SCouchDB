@@ -1,233 +1,219 @@
-Object subclass: #SCouchDatabase
-	instanceVariableNames: 'adaptor name'
-	classVariableNames: ''
-	poolDictionaries: 'SCouchHTTPCodes'
-	category: 'SCouchDB-Core'!
+Object subclass: SCouchDatabase [
+    | adaptor name |
+    
+    <import: SCouchHTTPCodes>
+    <category: 'SCouchDB-Core'>
+    <comment: nil>
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 07:40'!
-adaptor
+    adaptor [
 	"Answer the value of adaptor"
 
-	^ adaptor! !
+	<category: 'accessing'>
+	^adaptor
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 07:40'!
-adaptor: anObject
+    adaptor: anObject [
 	"Set the value of adaptor"
 
-	adaptor := anObject! !
+	<category: 'accessing'>
+	adaptor := anObject
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'gk 1/13/2010 12:12'!
-all
-
+    all [
+	<category: 'accessing'>
 	| json |
 	json := self allDocuments.
-	self halt.! !
+	self halt
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'gk 5/20/2010 16:22'!
-allDocuments
+    allDocuments [
+	<category: 'accessing'>
 	| result |
 	result := self getJson: '_all_docs?include_docs=true'.
-	^ (result at: 'rows') collect: [:row | row at: 'doc']! !
+	^(result at: 'rows') collect: [:row | row at: 'doc']
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'gk 5/20/2010 16:21'!
-allDocumentsAs: aClass
+    allDocumentsAs: aClass [
+	<category: 'accessing'>
 	| result |
 	result := self getJson: '_all_docs?include_docs=true'.
-	^ (result at: 'rows') collect: [:row | aClass fromCouchDocument: (row at: 'doc')]! !
+	^(result at: 'rows') 
+	    collect: [:row | aClass fromCouchDocument: (row at: 'doc')]
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/11/2010 23:57'!
-at: id 
+    at: id [
+	<category: 'accessing'>
+	^self at: id ifAbsent: [self error: 'Document with given id not found']
+    ]
 
-	^ self at: id ifAbsent: [ self error: 'Document with given id not found' ]! !
+    at: id ifAbsent: aBlock [
+	<category: 'accessing'>
+	^self documentToObject: (self documentAt: id ifAbsent: [^aBlock value])
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'gk 1/13/2010 12:09'!
-at: id ifAbsent: aBlock
-	
-	^self documentToObject: (self documentAt: id ifAbsent: [ ^ aBlock value ])! !
+    at: key put: object [
+	<category: 'accessing'>
+	^self documentAt: key put: object asCouchDocument
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/9/2010 17:25'!
-at: key put: object
-
-	^ self documentAt: key put: object asCouchDocument! !
-
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 4/8/2010 12:05'!
-documentAt: id
-
+    documentAt: id [
 	"read a single json document"
+
+	<category: 'accessing'>
 	| response result |
 	response := adaptor get: self namePrefix , id asString encodeForHTTP.
-
 	result := adaptor readJsonFrom: response.
-	response code = HTTPOK ifTrue: [ ^ result ].
-	
-	^ adaptor couchDBError: result! !
+	response code = HTTPOK ifTrue: [^result].
+	^adaptor couchDBError: result
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/13/2010 20:22'!
-documentAt: id ifAbsent: aBlock
-
+    documentAt: id ifAbsent: aBlock [
 	"read a single json document"
+
+	<category: 'accessing'>
 	| response |
 	response := adaptor get: self namePrefix , id asString encodeForHTTP.
+	response code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
+	^aBlock value
+    ]
 
-	response code = HTTPOK ifTrue: [
-		^ adaptor readJsonFrom: response.
-		].
-	
-	^ aBlock value! !
-
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/13/2010 13:06'!
-documentAt: key ifAbsentPut: aBlockWithJsonObject
-
+    documentAt: key ifAbsentPut: aBlockWithJsonObject [
 	"read a single json document"
+
+	<category: 'accessing'>
 	| response |
-	response := adaptor get:  self namePrefix , key asString encodeForHTTP.
+	response := adaptor get: self namePrefix , key asString encodeForHTTP.
+	response code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
+	^self documentAt: key put: aBlockWithJsonObject value
+    ]
 
-	response code = HTTPOK ifTrue: [
-		^ adaptor readJsonFrom: response 
-		].
-	
-	^self documentAt: key put: aBlockWithJsonObject value.
-! !
-
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 5/13/2010 04:44'!
-documentAt: id put: jsonObject
+    documentAt: id put: jsonObject [
+	<category: 'accessing'>
 	| response code content |
-	
 	content := self utf8Encode: jsonObject asJsonString.
 	response := self put: id asString encodeForHTTP content: content.
-	
 	code := response code.
-	
-	code = HTTPCreated ifTrue: [ ^adaptor readJsonFrom:  response ].
-	code = HTTPOK ifTrue: [ ^ adaptor readJsonFrom: response ].
+	code = HTTPCreated ifTrue: [^adaptor readJsonFrom: response].
+	code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
+	code = HTTPErrorConflict 
+	    ifTrue: 
+		["document already exists"
 
-	code = HTTPErrorConflict ifTrue: [ 
-		"document already exists"
-		| oldDoc | 
+		| oldDoc |
 		response closeStream.
 		oldDoc := self documentAt: id.
 		jsonObject at: '_rev' put: (oldDoc at: '_rev').
-		
-		" retry "
-		^ self documentAt: id put: jsonObject
-	].
 
+		"retry"
+		^self documentAt: id put: jsonObject].
 	self error: 'Boom'
+    ]
 
-! !
-
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 4/8/2010 11:56'!
-documentAt: id rev: rev
-
+    documentAt: id rev: rev [
+	<category: 'accessing'>
 	| response result |
-	response := adaptor get: self namePrefix , id asString encodeForHTTP ,
-		'?rev=' , rev asString encodeForHTTP.
-
+	response := adaptor 
+		    get: self namePrefix , id asString encodeForHTTP , '?rev=' 
+			    , rev asString encodeForHTTP.
 	result := adaptor readJsonFrom: response.
-	response code = HTTPOK ifTrue: [ ^ result ].
-	^ adaptor couchDBError: result! !
+	response code = HTTPOK ifTrue: [^result].
+	^adaptor couchDBError: result
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'gk 5/20/2010 16:01'!
-documentPut: jsonObject
+    documentPut: jsonObject [
+	<category: 'accessing'>
 	| response code content |
-	
 	content := self utf8Encode: jsonObject asJsonString.
 	response := self post: content.
-	
 	code := response code.
-	
-	code = HTTPCreated ifTrue: [ ^adaptor readJsonFrom:  response ].
-	code = HTTPOK ifTrue: [ ^ adaptor readJsonFrom: response ].
-
+	code = HTTPCreated ifTrue: [^adaptor readJsonFrom: response].
+	code = HTTPOK ifTrue: [^adaptor readJsonFrom: response].
 	self error: 'Boom'
+    ]
 
-! !
-
-!SCouchDatabase methodsFor: 'accessing' stamp: 'gk 1/13/2010 12:08'!
-documentToObject: json
-
+    documentToObject: json [
+	<category: 'accessing'>
 	| className binding |
-
 	className := json at: 'sq_class'.
 
 	"we're intentionally avoid using any globals here, such as Smalltalk"
 	binding := self class environment bindingOf: className asSymbol.
-	
-	binding ifNil: [ ^ self error: 'unable to instantiate - class not found' ].
-	
-	^ binding value instantiateFromCouchDocument: json.
-! !
+	binding ifNil: [^self error: 'unable to instantiate - class not found'].
+	^binding value instantiateFromCouchDocument: json
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/9/2010 17:11'!
-info
+    info [
 	"retrieve my info from server"
-	
-	^ adaptor getJson: self namePrefix! !
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 07:40'!
-name
-	^ name! !
+	<category: 'accessing'>
+	^adaptor getJson: self namePrefix
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 12/27/2009 07:40'!
-name: aString
-	name := aString! !
+    name [
+	<category: 'accessing'>
+	^name
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 1/9/2010 17:10'!
-namePrefix
-	"path prefix for db name , 
-	could be optimized later to use lazy-initialized ivar"
-	
-	^ '/' , self name , '/'
-! !
+    name: aString [
+	<category: 'accessing'>
+	name := aString
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'gk 5/20/2010 16:01'!
-put: object
+    namePrefix [
+	"path prefix for db name ,
+	 could be optimized later to use lazy-initialized ivar"
 
-	^ self documentPut: object asCouchDocument! !
+	<category: 'accessing'>
+	^'/' , self name , '/'
+    ]
 
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 5/13/2010 05:01'!
-utf8Encode: aString 
+    put: object [
+	<category: 'accessing'>
+	^self documentPut: object asCouchDocument
+    ]
 
-	^ ByteString streamContents: [:str | aString do: [:ch | self utf8Encode: ch to: str ]]
+    utf8Encode: aString [
+	<category: 'accessing'>
+	^ByteString 
+	    streamContents: [:str | aString do: [:ch | self utf8Encode: ch to: str]]
+    ]
 
-! !
-
-!SCouchDatabase methodsFor: 'accessing' stamp: 'Igor.Stasenko 5/13/2010 05:00'!
-utf8Encode: aChar to: aStream
+    utf8Encode: aChar to: aStream [
+	<category: 'accessing'>
 	| u |
 	u := aChar asUnicode.
-	u < 128 ifTrue: [ ^ aStream nextPut: aChar].
-	u < 16r800 ifTrue: [
-		^ aStream 
-			nextPut: (Character value: (2r11000000 + (u >> 6)));
-			nextPut: (Character value: (2r10000000 + (u bitAnd: 2r111111))) ].
-	u < 16r10000 ifTrue: [
-		^ aStream 
-			nextPut: (Character value: (2r11100000 + (u >> 12)));
-			nextPut: (Character value: (2r10000000 + ((u >> 6)bitAnd: 2r111111)));
-			nextPut: (Character value: (2r10000000 + (u bitAnd: 2r111111))) ].
-	u <= 16r10FFFF ifTrue: [
-		^ aStream 
-			nextPut: (Character value: (2r11110000 + (u >> 18)));
-			nextPut: (Character value: (2r10000000 + ((u >> 12)bitAnd: 2r111111)));
-			nextPut: (Character value: (2r10000000 + ((u >> 6)bitAnd: 2r111111)));
-			nextPut: (Character value: (2r10000000 + (u bitAnd: 2r111111))) ].
-
+	u < 128 ifTrue: [^aStream nextPut: aChar].
+	u < 2048 
+	    ifTrue: 
+		[^aStream
+		    nextPut: (Character value: 192 + (u >> 6));
+		    nextPut: (Character value: 128 + (u bitAnd: 63))].
+	u < 65536 
+	    ifTrue: 
+		[^aStream
+		    nextPut: (Character value: 224 + (u >> 12));
+		    nextPut: (Character value: 128 + (u >> 6 bitAnd: 63));
+		    nextPut: (Character value: 128 + (u bitAnd: 63))].
+	u <= 1114111 
+	    ifTrue: 
+		[^aStream
+		    nextPut: (Character value: 240 + (u >> 18));
+		    nextPut: (Character value: 128 + (u >> 12 bitAnd: 63));
+		    nextPut: (Character value: 128 + (u >> 6 bitAnd: 63));
+		    nextPut: (Character value: 128 + (u bitAnd: 63))].
 	self error: 'Invalid utf-8 value'
-! !
+    ]
 
+    getJson: path [
+	^adaptor getJson: self namePrefix , path
+    ]
 
-!SCouchDatabase methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 1/9/2010 17:11'!
-getJson: path 
+    post: aContent [
+	^adaptor post: self namePrefix content: aContent
+    ]
 
-	^ adaptor getJson:  self namePrefix , path! !
+    put: aReq content: aContent [
+	^adaptor put: self namePrefix , aReq content: aContent
+    ]
+]
 
-!SCouchDatabase methodsFor: 'as yet unclassified' stamp: 'rh 2/20/2010 13:35'!
-post: aContent
-
-	^ adaptor post: self namePrefix content: aContent! !
-
-!SCouchDatabase methodsFor: 'as yet unclassified' stamp: 'Igor.Stasenko 1/9/2010 17:11'!
-put: aReq content: aContent
-
-	^ adaptor put: self namePrefix, aReq content: aContent! !
