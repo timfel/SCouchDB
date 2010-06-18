@@ -29,6 +29,7 @@
 <filein>Extensions/String class.st</filein>
 <filein>Extensions/UndefinedObject.st</filein>
 <filein>Extensions/UndefinedObject class.st</filein>
+<filein>Extensions/WriteStream.st</filein>
 <file>Extensions/Boolean.st</file>
 <file>Extensions/Boolean class.st</file>
 <file>Extensions/Collection.st</file>
@@ -53,4 +54,5 @@
 <file>Extensions/String class.st</file>
 <file>Extensions/UndefinedObject.st</file>
 <file>Extensions/UndefinedObject class.st</file>
+<file>Extensions/WriteStream.st</file>
 </package>
