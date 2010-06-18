@@ -1,6 +1,6 @@
 <package>
 <!-- THIS FILE IS GENERATED! EDITS _WILL_ BE LOST ON UPDATE! -->
-<name>SCouchDB-Core</name>
+<name>SCouchDB</name>
 <prereq>JSON</prereq>
 <test>
 <sunit></sunit>

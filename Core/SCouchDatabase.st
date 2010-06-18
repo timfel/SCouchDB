@@ -1,7 +1,6 @@
 Object subclass: SCouchDatabase [
     | adaptor name |
     
-    <import: SCouchHTTPCodes>
     <category: 'SCouchDB-Core'>
     <comment: nil>
 

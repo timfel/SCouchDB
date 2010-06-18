@@ -1,4 +1,4 @@
-SharedPool subclass: SCouchHTTPCodes [
+Object subclass: SCouchHTTPCodes [
     
     <comment: nil>
     <category: 'SCouchDB-Core'>

@@ -1,7 +1,6 @@
 Object subclass: SCouchDBAdaptor [
     | host port resolvedHost httpResponseClass |
     
-    <import: SCouchHTTPCodes>
     <category: 'SCouchDB-Core'>
     <comment: nil>
 
